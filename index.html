@@ -7,13 +7,17 @@
 }
 
 .states {
+  fill: blue;
+}
+  
+.state-borders {
   fill: none;
   stroke: #fff;
   stroke-linejoin: round;
+  stroke-linecap: round;
 }
 
 </style>
-<body></body>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="https://d3js.org/topojson.v2.min.js"></script>
 <script>
@@ -28,10 +32,18 @@ var svg = d3.select("body").append("svg")
     .attr("height", height);
   
 d3.json("us.json", function(error, us) {
-  svg.append("path")
-      .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
-      .attr("id", "state-borders")
+  if (error) throw error;
+  
+  svg.append("g")
+    .attr("class","states")
+    .selectAll("path")
+    .data(topojson.feature(us, us.objects.states).features)
+    .enter().append("path")
       .attr("d", path);
+  
+  svg.append("path")
+    .attr("class", "state-borders")
+    .attr("d", path(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; })));
 });
 
 </script>
