@@ -34,6 +34,10 @@ var barsvg = d3.select(".barsvg")
 
 var x = d3.scaleBand().rangeRound([0, barwidth]).padding(0.1),
     y = d3.scaleLinear().rangeRound([barheight, 0]);
+
+var barg = barsvg.append("g")
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
 // ////////// END BAR VARIABLES ////////// //
 
 
@@ -74,8 +78,48 @@ tooltip.append("div")
   .html("percent of total food waste");  
 
 
- /// /// // // GO THROUGH THE DATA // // /// /// 
-d3.csv("https://raw.githubusercontent.com/jkimpai/foodwaste/master/us-fw.csv?token=APZJmF6-fSuYtM6LGtAa7BpmBho3-Xmeks5Zd3gowA%3D%3D", function(d) {
+function bars(data, total) {
+  x.domain(data.map(function(d) { return d.var.slice(12); }));
+  y.domain([0, d3.max(data, function(d) { return d.val; })]);
+
+  barg.append("g")
+    .attr("class", "xaxis")
+    .attr("transform", "translate(0,"+ barheight + ")")
+    .call(d3.axisBottom(x));
+
+  barg.append("g")
+    .attr("class", "yaxis")
+    .call(d3.axisLeft(y))
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", "-50")
+      .attr("x", "-50")
+      .attr("class", "yaxis-label")
+      .attr("text-anchor", "end")
+      .text("Millions of KGs");
+
+  var bars = barg.selectAll(".bar")
+    .data(data);
+
+  bars.enter().append("rect")
+    .attr("class", "bar")
+    .attr("id", function(d) { return (d.varID); });
+
+  bars.transition().duration(750)
+    .attr("x", function(d) { return x(d.var.slice(12)); })
+    .attr("y", function(d) { return y(d.val); })
+    .attr("width", x.bandwidth())
+    .attr("height", function(d) { return barheight - y(d.val); })
+    .style("fill", function(d) { return colorMap(d.val); })
+
+  bars.exit().transition().duration(750)
+    .selectAll("rect")
+    .attr("height", 0)
+    .remove();
+}
+
+/// /// // // GO THROUGH THE DATA // // /// /// 
+d3.csv("https://raw.githubusercontent.com/jkimpai/foodwaste/master/us-fw-2008-2010.csv", function(d) {
   d.val = +d.Value;
   d.unitID = d.UNIT; // PCT, MILLIONKG, MILLIONLOCALCURRENCY, TONNES, etc.
   d.year = +d.TIME; // year
@@ -100,53 +144,26 @@ d3.csv("https://raw.githubusercontent.com/jkimpai/foodwaste/master/us-fw.csv?tok
     return sum + d.val;
   }, 0);
 
-// BAR GRAPH BAR GRAPH BAR GRAPH BAR GRAPH BAR GRAPH BAR GRAPH BAR GRAPH 
-  x.domain(yrData.map(function(d) { return d.var.slice(12); }));
-  y.domain([0, d3.max(yrData, function(d) { return d.val; })]);
-
-  var barg = barsvg.append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-  
-  barg.append("g")
-    .attr("class", "xaxis")
-    .attr("transform", "translate(0,"+ barheight + ")")
-    .call(d3.axisBottom(x));
-
-  barg.append("g")
-    .attr("class", "yaxis")
-    .call(d3.axisLeft(y))
-    .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", "-50")
-      .attr("x", "-50")
-      .attr("class", "yaxis-label")
-      .attr("text-anchor", "end")
-      .text("Millions of KGs");
+  bars(yrData, total);
 
   barg.selectAll(".bar")
-    .data(yrData)
-    .enter().append("rect")
-      .attr("class", "bar")
-      .attr("id", function(d) { return (d.varID); })
-      .attr("x", function(d) { return x(d.var.slice(12)); })
-      .attr("y", function(d) { return y(d.val); })
-      .attr("width", x.bandwidth())
-      .attr("height", function(d) { return barheight - y(d.val); })
-      .style("fill", function(d) { return colorMap(d.val); })
-      .on("mouseover", function(d) {
-        d3.selectAll("#"+d.varID)
-          .style("fill", "orange");
-        tooltip.select(".label").html(d.var.slice(12));
-        tooltip.select(".count").html(d.val.toFixed(2) + " million kg");
-        tooltip.select(".percent").html((d.val/total * 100).toFixed(2) + "%");
-      })
-      .on("mouseout", function(d) {
-        d3.selectAll("#"+d.varID)
-          .style("fill", colorMap(d.val));
-        tooltip.select(".label").html("Mouseover graphs to get");
-        tooltip.select(".count").html("weight in millions of kgs &");
-        tooltip.select(".percent").html("percent of total food waste");
-      });
+    .on("mouseover", function(d) {
+      d3.selectAll("#"+d.varID)
+        .style("fill", "orange");
+      tooltip.select(".label").html(d.var.slice(12));
+      tooltip.select(".count").html(d.val.toFixed(2) + " million kg");
+      tooltip.select(".percent").html((d.val/total * 100).toFixed(2) + "%");
+    })
+    .on("mouseout", function(d) {
+      d3.selectAll("#"+d.varID)
+        .style("fill", colorMap(d.val));
+      tooltip.select(".label").html("Mouseover graphs to get");
+      tooltip.select(".count").html("weight in millions of kgs &");
+      tooltip.select(".percent").html("percent of total food waste");
+    });
+
+// // BAR GRAPH BAR GRAPH BAR GRAPH BAR GRAPH BAR GRAPH BAR GRAPH BAR GRAPH 
+
 /////////////////////////////////////////////////////////////////////////
 
 
@@ -191,7 +208,9 @@ d3.csv("https://raw.githubusercontent.com/jkimpai/foodwaste/master/us-fw.csv?tok
 
 function setYr() {
   yr = document.getElementsByName("Year")[0].value;
-  d3.csv("https://raw.githubusercontent.com/jkimpai/foodwaste/master/us-fw.csv?token=APZJmF6-fSuYtM6LGtAa7BpmBho3-Xmeks5Zd3gowA%3D%3D", function(d) {
+  console.log(yr);
+
+  d3.csv("https://raw.githubusercontent.com/jkimpai/foodwaste/master/us-fw-2008-2010.csv", function(d) {
     d.val = +d.Value;
     d.unitID = d.UNIT; // PCT, MILLIONKG, MILLIONLOCALCURRENCY, TONNES, etc.
     d.year = +d.TIME; // year
@@ -215,19 +234,7 @@ function setYr() {
       return sum + d.val;
     }, 0);
 
-    x.domain(yrData.map(function(d) { return d.var.slice(12); }));
-    y.domain([0, d3.max(yrData, function(d) { return d.val; })]);
-
-    var barg = barsvg.select("g");
-
-    barg.selectAll(".bar").transition().duration(750)
-      .attr("class", "bar")
-      .attr("id", function(d) { return (d.varID); })
-      .attr("x", function(d) { return x(d.var.slice(12)); })
-      .attr("y", function(d) { return y(d.val); })
-      .attr("width", x.bandwidth())
-      .attr("height", function(d) { return barheight - y(d.val); })
-      .style("fill", function(d) { return colorMap(d.val); });
+    bars(yrData, total);
   });
 };
 
