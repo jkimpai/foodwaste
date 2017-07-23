@@ -1,0 +1,57 @@
+h2 {
+  font: 70pt Helvetica;
+  color: #0B486B;
+}
+
+body {
+  text-align: center;
+}
+
+.info-bar {
+  margin: 50px;
+  height: 5px;
+}
+
+.pie-graph path {
+  stroke: white;
+  stroke-width: 1px;
+}
+
+.pie-graph text {
+  font: 8pt Helvetica;
+  fill: white;
+}
+
+.pie-container {
+  display: inline-block;
+  text-align: center;
+  vertical-align: top;
+}
+
+.tooltip {
+  background: white;
+  border: solid #0B486B 2px;
+  color: #0B486B;
+  display: block;
+  font: 10pt Helvetica;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  width: 200px;
+  height: auto;
+  margin: auto;
+  margin-top: 20px;
+}
+
+g .xaxis .tick text {
+  transform: rotate(310deg);
+  text-anchor: end;
+}
+
+.yaxis-label {
+  fill: black;
+  font: 10pt Helvetica;
+}
+
+.bar-container{
+  display: inline-block;
+}
