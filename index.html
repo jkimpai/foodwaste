@@ -2,11 +2,9 @@
 <link rel="stylesheet" href="style.css">
 <body>
   <div class="info-bar">
-    <select name="Year" onChange="setYr()">
-      <option value="SelectYr" selected disabled>Select Year</option>
-      <option value="2008">2008</option>
-      <option value="2010">2010</option>
-    </select>
+    <label> Select Data Year: </label>
+    <label><input type="radio" name="yr" value="2010" onClick="setYr(2010)" checked>2010</label>
+    <label><input type="radio" name="yr" value="2008" onClick="setYr(2008)">2008</label>
   </div>
   <div class = "bar-container"> 
     <svg class="barsvg" width="550" height="300"></svg>
@@ -19,7 +17,6 @@
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
-
   
 // query vars
 var yr = 2010;
@@ -34,12 +31,6 @@ var barsvg = d3.select(".barsvg")
 
 var x = d3.scaleBand().rangeRound([0, barwidth]).padding(0.1),
     y = d3.scaleLinear().rangeRound([barheight, 0]);
-
-var barg = barsvg.append("g")
-  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-// ////////// END BAR VARIABLES ////////// //
-
 
 // //////////// PIE VARIABLES //////////// //
 var piesvg = d3.select(".piesvg")
@@ -61,8 +52,8 @@ var labelArc = d3.arc()
 var pie = d3.pie()
   .sort(null)
   .value(function(d) { return d.val; });
-// ////////// END PIE VARIABLES ////////// //
 
+// other random vars
 var colorMap = d3.scaleOrdinal()
     .range(["#CFF09E", "#A8DBA8", "#79BD9A", "#3B8686", "#216b96", "#0B486B"]);
 
@@ -76,47 +67,6 @@ tooltip.append("div")
 tooltip.append("div")
   .attr("class", "percent")
   .html("percent of total food waste");  
-
-
-function bars(data, total) {
-  x.domain(data.map(function(d) { return d.var.slice(12); }));
-  y.domain([0, d3.max(data, function(d) { return d.val; })]);
-
-  barg.append("g")
-    .attr("class", "xaxis")
-    .attr("transform", "translate(0,"+ barheight + ")")
-    .call(d3.axisBottom(x));
-
-  barg.append("g")
-    .attr("class", "yaxis")
-    .call(d3.axisLeft(y))
-    .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", "-50")
-      .attr("x", "-50")
-      .attr("class", "yaxis-label")
-      .attr("text-anchor", "end")
-      .text("Millions of KGs");
-
-  var bars = barg.selectAll(".bar")
-    .data(data);
-
-  bars.enter().append("rect")
-    .attr("class", "bar")
-    .attr("id", function(d) { return (d.varID); });
-
-  bars.transition().duration(750)
-    .attr("x", function(d) { return x(d.var.slice(12)); })
-    .attr("y", function(d) { return y(d.val); })
-    .attr("width", x.bandwidth())
-    .attr("height", function(d) { return barheight - y(d.val); })
-    .style("fill", function(d) { return colorMap(d.val); })
-
-  bars.exit().transition().duration(750)
-    .selectAll("rect")
-    .attr("height", 0)
-    .remove();
-}
 
 /// /// // // GO THROUGH THE DATA // // /// /// 
 d3.csv("https://raw.githubusercontent.com/jkimpai/foodwaste/master/us-fw-2008-2010.csv", function(d) {
@@ -143,18 +93,51 @@ d3.csv("https://raw.githubusercontent.com/jkimpai/foodwaste/master/us-fw-2008-20
   var total = yrData.reduce(function(sum, d) {
     return sum + d.val;
   }, 0);
+  
+  // BAR GRAPH 
+  x.domain(yrData.map(function(d) { return d.var.slice(12); }));
+  y.domain([0, d3.max(yrData, function(d) { return d.val; })]);
+  
+  var barg = barsvg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  
+  barg.append("g")
+    .attr("class", "xaxis")
+    .attr("transform", "translate(0,"+ barheight + ")")
+    .call(d3.axisBottom(x));
 
-  bars(yrData, total);
+  barg.append("g")
+    .attr("class", "yaxis")
+    .call(d3.axisLeft(y))
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", "-50")
+      .attr("x", "-50")
+      .attr("class", "yaxis-label")
+      .attr("text-anchor", "end")
+      .text("Millions of KGs");
 
   barg.selectAll(".bar")
-    .on("mouseover", function(d) {
+      .data(yrData)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("id", function(d) { return (d.varID); })
+      .attr("x", function(d) { return x(d.var.slice(12)); })
+      .attr("y", function(d) { return y(d.val); })
+      .attr("width", x.bandwidth())
+      .attr("height", function(d) { return barheight - y(d.val); })
+      .style("fill", function(d) { return colorMap(d.val); });
+
+  var bars = barg.selectAll(".bar");
+  bars.on("mouseover", function(d) {
       d3.selectAll("#"+d.varID)
         .style("fill", "orange");
       tooltip.select(".label").html(d.var.slice(12));
       tooltip.select(".count").html(d.val.toFixed(2) + " million kg");
       tooltip.select(".percent").html((d.val/total * 100).toFixed(2) + "%");
-    })
-    .on("mouseout", function(d) {
+    });
+
+  bars.on("mouseout", function(d) {
       d3.selectAll("#"+d.varID)
         .style("fill", colorMap(d.val));
       tooltip.select(".label").html("Mouseover graphs to get");
@@ -162,54 +145,68 @@ d3.csv("https://raw.githubusercontent.com/jkimpai/foodwaste/master/us-fw-2008-20
       tooltip.select(".percent").html("percent of total food waste");
     });
 
-// // BAR GRAPH BAR GRAPH BAR GRAPH BAR GRAPH BAR GRAPH BAR GRAPH BAR GRAPH 
-
-/////////////////////////////////////////////////////////////////////////
-
-
-
-// PIE CHART PIE CHART PIE CHART PIE CHART PIE CHART PIE CHART PIE CHART 
+  // PIE CHART 
   // whole pie chart
-  var pieg = piesvg.selectAll(".arc")
-    .data(pie(yrData))
-    .enter().append("g")
-      .attr("class","pie-graph")
-      .attr("transform", "translate(" + (piewidth/2) + "," + (pieheight/2) + ")");
+  var pieg = piesvg.append("g")
+    .attr("class","pie-graph")
+    .attr("transform", "translate(" + (piewidth/2) + "," + (pieheight/2) + ")");
 
-  // individual pie slices
-  pieg.append("path")
-    .attr("d", arc)
-    .attr("class", "arc")
-    .attr("id", function(d) { return (d.data.varID); })
-    .style("fill", function(d) { return colorMap(d.value); })
-    .on("mouseover", function(d) {
-      d3.selectAll("#"+d.data.varID)
-        .style("fill", "orange");
-    })
-    .on("mouseout", function(d) {
-      d3.selectAll("#"+d.data.varID)
-        .style("fill", colorMap(d.value));
-    });
+  var arcs = pieg.selectAll(".arc")
+    .data(pie(yrData))      
+    .enter().append("path")
+      .attr("d", arc)
+      .attr("class", "arc")
+      .attr("id", function(d) { return (d.data.varID); })
+      .style("fill", function(d) { return colorMap(d.value); });
 
-  pieg.on("mouseover", function(d) {
-    tooltip.select(".label").html(d.data.var.slice(13));
+  pieg.selectAll(".arc").on("mouseover", function(d) {
+    d3.selectAll("#"+d.data.varID)
+      .style("fill", "orange");
+    tooltip.select(".label").html(d.data.var.slice(12));
     tooltip.select(".count").html(d.data.val.toFixed(2) + " million kg");
     tooltip.select(".percent").html((d.data.val/total * 100).toFixed(2) + "%");
   });
 
-  pieg.on("mouseout", function(d) {
+  pieg.selectAll(".arc").on("mouseout", function(d) {
+    d3.selectAll("#"+d.data.varID)
+      .style("fill", colorMap(d.value));
     tooltip.select(".label").html("Mouseover graphs to get");
     tooltip.select(".count").html("weight in millions of kgs &");
     tooltip.select(".percent").html("percent of total food waste");
   });
-/////////////////////////////////////////////////////////////////////////
-
 });
 
-function setYr() {
-  yr = document.getElementsByName("Year")[0].value;
-  console.log(yr);
+function bars(data, total) {
+  var barg = barsvg.select("g");
+  var bars = barg.selectAll(".bar")
+    .data(data);
 
+  bars.transition().duration(500)
+    .attr("x", function(d) { return x(d.var.slice(12)); })
+    .attr("y", function(d) { return y(d.val); })
+    .attr("width", x.bandwidth())
+    .attr("height", function(d) { return barheight - y(d.val); })
+    .style("fill", function(d) { return colorMap(d.val); });
+
+  bars.on("mouseover", function(d) {
+      d3.selectAll("#"+d.varID)
+        .style("fill", "orange");
+      tooltip.select(".label").html(d.var.slice(12));
+      tooltip.select(".count").html(d.val.toFixed(2) + " million kg");
+      tooltip.select(".percent").html((d.val/total * 100).toFixed(2) + "%");
+    });
+
+  bars.on("mouseout", function(d) {
+      d3.selectAll("#"+d.varID)
+        .style("fill", colorMap(d.val));
+      tooltip.select(".label").html("Mouseover graphs to get");
+      tooltip.select(".count").html("weight in millions of kgs &");
+      tooltip.select(".percent").html("percent of total food waste");
+    });
+
+};
+
+function setYr(yr) {
   d3.csv("https://raw.githubusercontent.com/jkimpai/foodwaste/master/us-fw-2008-2010.csv", function(d) {
     d.val = +d.Value;
     d.unitID = d.UNIT; // PCT, MILLIONKG, MILLIONLOCALCURRENCY, TONNES, etc.
@@ -233,10 +230,22 @@ function setYr() {
     var total = yrData.reduce(function(sum, d) {
       return sum + d.val;
     }, 0);
-
+    var arcs = piesvg.select("g").selectAll(".arc")
+      .data(pie(yrData));
+    arcs.transition().duration(500).attrTween("d", arcTween);
     bars(yrData, total);
   });
 };
 
+// Store the displayed angles in _current.
+// Then, interpolate from _current to the new angles.
+// During the transition, _current is updated in-place by d3.interpolate.
+function arcTween(a) {
+  var i = d3.interpolate(this._current, a);
+  this._current = i(0);
+  return function(t) {
+    return arc(i(t));
+  };
+};
 
 </script>
