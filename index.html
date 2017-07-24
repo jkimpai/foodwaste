@@ -2,6 +2,8 @@
 <link rel="stylesheet" href="style.css">
 <body>
   <div class="info-bar">
+    <h2>Household Food Waste in the US<h2>
+    <h3>broken down into food categories</h3>
     <label> Select Data Year: </label>
     <label><input type="radio" name="yr" value="2010" onClick="setYr(2010)" checked>2010</label>
     <label><input type="radio" name="yr" value="2008" onClick="setYr(2008)">2008</label>
@@ -112,10 +114,10 @@ d3.csv("https://raw.githubusercontent.com/jkimpai/foodwaste/master/us-fw-2008-20
     .append("text")
       .attr("transform", "rotate(-90)")
       .attr("y", "-50")
-      .attr("x", "-50")
+      .attr("x", "-30")
       .attr("class", "yaxis-label")
       .attr("text-anchor", "end")
-      .text("Millions of KGs");
+      .text("Waste in Millions of KGs");
 
   barg.selectAll(".bar")
       .data(yrData)
