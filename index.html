@@ -9,7 +9,7 @@
     <label><input type="radio" name="yr" value="2008" onClick="setYr(2008)">2008</label>
   </div>
   <div class = "bar-container"> 
-    <svg class="barsvg" width="550" height="300"></svg>
+    <svg class="barsvg" width="550" height="400"></svg>
   </div>
   <div class="pie-container">
     <svg class="piesvg" width="300" height="250"></svg>
@@ -97,7 +97,7 @@ d3.csv("https://raw.githubusercontent.com/jkimpai/foodwaste/master/us-fw-2008-20
   }, 0);
   
   // BAR GRAPH 
-  x.domain(yrData.map(function(d) { return d.var.slice(12); }));
+  x.domain(yrData.map(function(d) { return d.var; }));
   y.domain([0, d3.max(yrData, function(d) { return d.val; })]);
   
   var barg = barsvg.append("g")
@@ -124,7 +124,7 @@ d3.csv("https://raw.githubusercontent.com/jkimpai/foodwaste/master/us-fw-2008-20
     .enter().append("rect")
       .attr("class", "bar")
       .attr("id", function(d) { return (d.varID); })
-      .attr("x", function(d) { return x(d.var.slice(12)); })
+      .attr("x", function(d) { return x(d.var); })
       .attr("y", function(d) { return y(d.val); })
       .attr("width", x.bandwidth())
       .attr("height", function(d) { return barheight - y(d.val); })
@@ -134,7 +134,7 @@ d3.csv("https://raw.githubusercontent.com/jkimpai/foodwaste/master/us-fw-2008-20
   bars.on("mouseover", function(d) {
       d3.selectAll("#"+d.varID)
         .style("fill", "orange");
-      tooltip.select(".label").html(d.var.slice(12));
+      tooltip.select(".label").html(d.var);
       tooltip.select(".count").html(d.val.toFixed(2) + " million kg");
       tooltip.select(".percent").html((d.val/total * 100).toFixed(2) + "%");
     });
@@ -148,7 +148,6 @@ d3.csv("https://raw.githubusercontent.com/jkimpai/foodwaste/master/us-fw-2008-20
     });
 
   // PIE CHART 
-  // whole pie chart
   var pieg = piesvg.append("g")
     .attr("class","pie-graph")
     .attr("transform", "translate(" + (piewidth/2) + "," + (pieheight/2) + ")");
@@ -164,7 +163,7 @@ d3.csv("https://raw.githubusercontent.com/jkimpai/foodwaste/master/us-fw-2008-20
   pieg.selectAll(".arc").on("mouseover", function(d) {
     d3.selectAll("#"+d.data.varID)
       .style("fill", "orange");
-    tooltip.select(".label").html(d.data.var.slice(12));
+    tooltip.select(".label").html(d.data.var);
     tooltip.select(".count").html(d.data.val.toFixed(2) + " million kg");
     tooltip.select(".percent").html((d.data.val/total * 100).toFixed(2) + "%");
   });
@@ -184,7 +183,7 @@ function bars(data, total) {
     .data(data);
 
   bars.transition().duration(500)
-    .attr("x", function(d) { return x(d.var.slice(12)); })
+    .attr("x", function(d) { return x(d.var); })
     .attr("y", function(d) { return y(d.val); })
     .attr("width", x.bandwidth())
     .attr("height", function(d) { return barheight - y(d.val); })
@@ -193,7 +192,7 @@ function bars(data, total) {
   bars.on("mouseover", function(d) {
       d3.selectAll("#"+d.varID)
         .style("fill", "orange");
-      tooltip.select(".label").html(d.var.slice(12));
+      tooltip.select(".label").html(d.var);
       tooltip.select(".count").html(d.val.toFixed(2) + " million kg");
       tooltip.select(".percent").html((d.val/total * 100).toFixed(2) + "%");
     });
