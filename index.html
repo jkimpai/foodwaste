@@ -1,252 +1,31 @@
 <!DOCTYPE html>
 <link rel="stylesheet" href="style.css">
-<body>
-  <div class="info-bar">
-    <h2>Household Food Waste in the US<h2>
-    <h3>broken down into food categories</h3>
-    <label> Select Data Year: </label>
-    <label><input type="radio" name="yr" value="2010" onClick="setYr(2010)" checked>2010</label>
-    <label><input type="radio" name="yr" value="2008" onClick="setYr(2008)">2008</label>
+<div id="all">
+  <div id="headerBar">
+    <h2>Food Waste in the US</h2>
+    <h3>broken down into food types & categories</h3>
+  </div>  
+  <div id="graphs">
+    <div class = "barDiv"></div>
+    <div class="pieDiv"></div>
   </div>
-  <div class = "bar-container"> 
-    <svg class="barsvg" width="550" height="400"></svg>
+</div>
+<div id="optionsBox">
+    <div class="checkbox">
+      <label>Data Year:</label>
+      <form id="yrForm">
+        <input type="radio" name="yr" value="2010" checked>2010<br />
+        <input type="radio" name="yr" value="2008">2008<br />
+      </form>
+    </div>
+    <div class="checkbox">
+      <label>Data Category:</label>
+      <form id="actForm">
+        <input type="radio" name="act" value="HOUSEHOLDS" checked>Household<br />
+        <input type="radio" name="act" value="WHOLESALEANDRETAIL">Wholesale & Retail<br />
+      </form>
+    </div>
   </div>
-  <div class="pie-container">
-    <svg class="piesvg" width="300" height="250"></svg>
-    <div class="tooltip"></div>
-  </div>
-</body>
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 <script src="https://d3js.org/d3.v4.min.js"></script>
-<script>
-  
-// query vars
-var yr = 2010;
-var un = "MILLIONKG";
-var ac = "HOUSEHOLDS";
-
-// //////////// BAR VARIABLES //////////// //
-var barsvg = d3.select(".barsvg")
-  margin = {top: 0, right: 0, bottom: 110, left: 60},
-  barwidth = +barsvg.attr("width") - margin.left - margin.right,
-  barheight = +barsvg.attr("height") - margin.top - margin.bottom;
-
-var x = d3.scaleBand().rangeRound([0, barwidth]).padding(0.1),
-    y = d3.scaleLinear().rangeRound([barheight, 0]);
-
-// //////////// PIE VARIABLES //////////// //
-var piesvg = d3.select(".piesvg")
-  piewidth = +piesvg.attr("width"),
-  pieheight = +piesvg.attr("height"),
-  radius = Math.min(piewidth,pieheight) / 2;
-
-var whole = 2 * Math.PI;
-var donutWidth = 80;
-
-var arc = d3.arc()
-  .outerRadius(radius)
-  .innerRadius(radius - donutWidth);
-
-var labelArc = d3.arc()
-  .outerRadius(radius - (donutWidth/2))
-  .innerRadius(radius - (donutWidth/2));
-
-var pie = d3.pie()
-  .sort(null)
-  .value(function(d) { return d.val; });
-
-// other random vars
-var colorMap = d3.scaleOrdinal()
-    .range(["#CFF09E", "#A8DBA8", "#79BD9A", "#3B8686", "#216b96", "#0B486B"]);
-
-var tooltip = d3.select(".tooltip");
-tooltip.append("div")
-  .attr("class", "label")
-  .html("Mouseover graphs to get"); 
-tooltip.append("div") 
-  .attr("class", "count")
-  .html("weight in millions of kgs &");
-tooltip.append("div")
-  .attr("class", "percent")
-  .html("percent of total food waste");  
-
-/// /// // // GO THROUGH THE DATA // // /// /// 
-d3.csv("https://raw.githubusercontent.com/jkimpai/foodwaste/master/us-fw-2008-2010.csv", function(d) {
-  d.val = +d.Value;
-  d.unitID = d.UNIT; // PCT, MILLIONKG, MILLIONLOCALCURRENCY, TONNES, etc.
-  d.year = +d.TIME; // year
-  d.catID = d.CAT; // food loss - food waste (FLFW), monetary and economic impact (MAEI), others (OTH)
-  d.actID = d.ACT; // RETAIL, HOUSEHOLDS, SCHOOLCANTINES, TOTAL, etc.
-  d.varID = d.VAR;
-  d.var = d.Variable; // e.g. Food Loss - Poultry and Fish
-  d.sourceID = d.SRC; 
-  d.source = d.Source;
-
-  return d; 
-}, function(error, data) {
-  if (error) throw error;
-
-  // filter out data for the given year
-  var yrData = data.filter(function(d) {
-    return (d.year == yr) && (d.unitID == un) && (d.actID == ac) && (d.var != "Food Loss");
-  });
-  //console.log(yrData);
-
-  var total = yrData.reduce(function(sum, d) {
-    return sum + d.val;
-  }, 0);
-  
-  // BAR GRAPH 
-  x.domain(yrData.map(function(d) { return d.var; }));
-  y.domain([0, d3.max(yrData, function(d) { return d.val; })]);
-  
-  var barg = barsvg.append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-  
-  barg.append("g")
-    .attr("class", "xaxis")
-    .attr("transform", "translate(0,"+ barheight + ")")
-    .call(d3.axisBottom(x));
-
-  barg.append("g")
-    .attr("class", "yaxis")
-    .call(d3.axisLeft(y))
-    .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", "-50")
-      .attr("x", "-30")
-      .attr("class", "yaxis-label")
-      .attr("text-anchor", "end")
-      .text("Waste in Millions of KGs");
-
-  barg.selectAll(".bar")
-      .data(yrData)
-    .enter().append("rect")
-      .attr("class", "bar")
-      .attr("id", function(d) { return (d.varID); })
-      .attr("x", function(d) { return x(d.var); })
-      .attr("y", function(d) { return y(d.val); })
-      .attr("width", x.bandwidth())
-      .attr("height", function(d) { return barheight - y(d.val); })
-      .style("fill", function(d) { return colorMap(d.val); });
-
-  var bars = barg.selectAll(".bar");
-  bars.on("mouseover", function(d) {
-      d3.selectAll("#"+d.varID)
-        .style("fill", "orange");
-      tooltip.select(".label").html(d.var);
-      tooltip.select(".count").html(d.val.toFixed(2) + " million kg");
-      tooltip.select(".percent").html((d.val/total * 100).toFixed(2) + "%");
-    });
-
-  bars.on("mouseout", function(d) {
-      d3.selectAll("#"+d.varID)
-        .style("fill", colorMap(d.val));
-      tooltip.select(".label").html("Mouseover graphs to get");
-      tooltip.select(".count").html("weight in millions of kgs &");
-      tooltip.select(".percent").html("percent of total food waste");
-    });
-
-  // PIE CHART 
-  var pieg = piesvg.append("g")
-    .attr("class","pie-graph")
-    .attr("transform", "translate(" + (piewidth/2) + "," + (pieheight/2) + ")");
-
-  var arcs = pieg.selectAll(".arc")
-    .data(pie(yrData))      
-    .enter().append("path")
-      .attr("d", arc)
-      .attr("class", "arc")
-      .attr("id", function(d) { return (d.data.varID); })
-      .style("fill", function(d) { return colorMap(d.value); });
-
-  pieg.selectAll(".arc").on("mouseover", function(d) {
-    d3.selectAll("#"+d.data.varID)
-      .style("fill", "orange");
-    tooltip.select(".label").html(d.data.var);
-    tooltip.select(".count").html(d.data.val.toFixed(2) + " million kg");
-    tooltip.select(".percent").html((d.data.val/total * 100).toFixed(2) + "%");
-  });
-
-  pieg.selectAll(".arc").on("mouseout", function(d) {
-    d3.selectAll("#"+d.data.varID)
-      .style("fill", colorMap(d.value));
-    tooltip.select(".label").html("Mouseover graphs to get");
-    tooltip.select(".count").html("weight in millions of kgs &");
-    tooltip.select(".percent").html("percent of total food waste");
-  });
-});
-
-function bars(data, total) {
-  var barg = barsvg.select("g");
-  var bars = barg.selectAll(".bar")
-    .data(data);
-
-  bars.transition().duration(500)
-    .attr("x", function(d) { return x(d.var); })
-    .attr("y", function(d) { return y(d.val); })
-    .attr("width", x.bandwidth())
-    .attr("height", function(d) { return barheight - y(d.val); })
-    .style("fill", function(d) { return colorMap(d.val); });
-
-  bars.on("mouseover", function(d) {
-      d3.selectAll("#"+d.varID)
-        .style("fill", "orange");
-      tooltip.select(".label").html(d.var);
-      tooltip.select(".count").html(d.val.toFixed(2) + " million kg");
-      tooltip.select(".percent").html((d.val/total * 100).toFixed(2) + "%");
-    });
-
-  bars.on("mouseout", function(d) {
-      d3.selectAll("#"+d.varID)
-        .style("fill", colorMap(d.val));
-      tooltip.select(".label").html("Mouseover graphs to get");
-      tooltip.select(".count").html("weight in millions of kgs &");
-      tooltip.select(".percent").html("percent of total food waste");
-    });
-
-};
-
-function setYr(yr) {
-  d3.csv("https://raw.githubusercontent.com/jkimpai/foodwaste/master/us-fw-2008-2010.csv", function(d) {
-    d.val = +d.Value;
-    d.unitID = d.UNIT; // PCT, MILLIONKG, MILLIONLOCALCURRENCY, TONNES, etc.
-    d.year = +d.TIME; // year
-    d.catID = d.CAT; // food loss - food waste (FLFW), monetary and economic impact (MAEI), others (OTH)
-    d.actID = d.ACT; // RETAIL, HOUSEHOLDS, SCHOOLCANTINES, TOTAL, etc.
-    d.varID = d.VAR;
-    d.var = d.Variable; // e.g. Food Loss - Poultry and Fish
-    d.sourceID = d.SRC; 
-    d.source = d.Source;
-
-    return d; 
-  }, function(error, data) {
-    if (error) throw error;
-
-    // filter out data for the given year
-    var yrData = data.filter(function(d) {
-      return (d.year == yr) && (d.unitID == un) && (d.actID == ac) && (d.var != "Food Loss");
-    });
-
-    var total = yrData.reduce(function(sum, d) {
-      return sum + d.val;
-    }, 0);
-    var arcs = piesvg.select("g").selectAll(".arc")
-      .data(pie(yrData));
-    arcs.transition().duration(500).attrTween("d", arcTween);
-    bars(yrData, total);
-  });
-};
-
-// Store the displayed angles in _current.
-// Then, interpolate from _current to the new angles.
-// During the transition, _current is updated in-place by d3.interpolate.
-function arcTween(a) {
-  var i = d3.interpolate(this._current, a);
-  this._current = i(0);
-  return function(t) {
-    return arc(i(t));
-  };
-};
-
-</script>
+<script src="graphs.js"></script>
