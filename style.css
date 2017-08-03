@@ -1,19 +1,11 @@
-h2 {
-  font: 35pt Helvetica;
-  color: #0B486B;
-  margin: 0;
-}
-
-h3 {
-  font: 14pt Helvetica;
-  font-style: italic;
-  color: #216b96;
-  margin-top: 0;
-  margin-bottom: 10px;
+:root {
+  --bg: #282828;
+  --module-bg: #484848;
+  --light-txt: White;
 }
 
 body {
-  background-color: WhiteSmoke;
+  background-color: var(--bg);
 }
 
 #all {
@@ -25,8 +17,19 @@ body {
   bottom: 0px;
 }
 
-#headerBar {
-  text-align: center;
+h2 {
+  font: 50pt Helvetica;
+  color: var(--light-txt);
+  margin-top: 25px;
+  margin-bottom: 5px;
+}
+
+h3 {
+  font: 14pt Helvetica;
+  font-style: italic;
+  color: var(--light-txt);
+  margin-top: 0;
+  margin-bottom: 25px;
 }
 
 #optionsBox {
@@ -36,8 +39,8 @@ body {
   height: 155px;
   width: 116px;
   display: inline-block;
-  background-color: #0B486B;
-  color: white;
+  background-color: var(--module-bg);
+  color: var(--light-txt);
   text-align: left;
   font: 10pt Helvetica;
 }
@@ -51,19 +54,9 @@ body {
   display: inline-block;
 }
 
-#pieGraph path {
-  stroke: white;
-  stroke-width: 1px;
-}
-
-#pieGraph text {
-  font: 8pt Helvetica;
-  fill: white;
-}
-
 .graphDiv {
-  background-color: white;
-  padding: 10px;
+  background-color: var(--module-bg);
+  padding: 25px;
   margin: 10px;
   text-align: center;
   border-radius: 3%;
@@ -71,40 +64,41 @@ body {
   vertical-align: top;
 }
 
+#tooltipDiv {
+  height: 46px;
+  width: 185px;
+  background-color: var(--bg);
+  /*border: solid var(--light-txt) 2px;*/
+  color: var(--light-txt);
+  font: 10pt Helvetica;
+  padding: 5px;
+  margin: auto;
+  margin-top: 10px;
+}
+
 g .xAxis path {
-  stroke: #0B486B;
+  stroke: var(--light-txt);
 }
 
 g .xAxis .tick line {
-  stroke: #0B486B;
+  stroke: var(--light-txt);
 }
 
 g .xAxis .tick text {
   transform: rotate(310deg);
   text-anchor: end;
-  fill: #0B486B;
-}
-
-g .xAxis .tick line {
-  stroke: #0B486B;
+  fill: var(--light-txt);
 }
 
 g .yAxis path {
-  stroke: #0B486B;
+  stroke: var(--light-txt);
+}
+
+g .yAxis .tick line {
+  stroke: var(--light-txt);
 }
 
 g .yAxis text {
   font: 8pt Helvetica;
-  fill: #0B486B;
-}
-
-#tooltipDiv {
-  height: 46px;
-  width: 185px;
-  background-color: WhiteSmoke;
-  border: solid #0B486B 2px;
-  color: #0B486B;
-  font: 10pt Helvetica;
-  margin: auto;
-  margin-top: 10px;
+  fill: var(--light-txt);
 }
