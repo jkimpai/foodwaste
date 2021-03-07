@@ -61,9 +61,29 @@ function buildBarGraph(yrData, total) {
 };
 
 function updateBars(yrData, total) {
+  // get data again
+  x.domain(yrData.map(function(d) { return d.var; }));
+  y.domain([0, d3.max(yrData, function(d) { return d.val; })]);
+
+  bars.select(".xAxis").transition()
+    .duration(750)
+    .delay(function(d, i) { return i * 50; })
+    .attr("transform", "translate(0,"+ barHeight + ")")
+    .call(d3.axisBottom(x));
+
+  // y axis
+  bars.select(".yAxis").transition()
+    .duration(750)
+    .delay(function(d, i) { return i * 50; })
+    .attr("class", "yAxis")
+    .call(d3.axisLeft(y))
+
 	bars.selectAll(".bar")
         .data(yrData)
-      .transition().duration(750)
+      .transition()
+        .duration(750)
+        .delay(function(d, i) { return i * 50; })
+        .attr("x", function(d) { return x(d.var); })
         .attr("y", function(d) { return y(d.val); })
         .attr("height", function(d) { return barHeight - y(d.val); });
 

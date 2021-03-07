@@ -18,14 +18,14 @@ body {
 }
 
 h2 {
-  font: 50pt Helvetica;
+  font: 40pt Helvetica;
   color: var(--light-txt);
   margin-top: 25px;
   margin-bottom: 5px;
 }
 
 h3 {
-  font: 14pt Helvetica;
+  font: 16pt Helvetica;
   font-style: italic;
   color: var(--light-txt);
   margin-top: 0;
@@ -36,13 +36,13 @@ h3 {
   position: fixed;
   left: 0px;
   top: 80px;
-  height: 155px;
-  width: 116px;
+  height: 184px;
+  width: 124px;
   display: inline-block;
   background-color: var(--module-bg);
   color: var(--light-txt);
   text-align: left;
-  font: 10pt Helvetica;
+  font: 12pt Helvetica;
 }
 
 .checkbox {
@@ -65,12 +65,12 @@ h3 {
 }
 
 #tooltipDiv {
-  height: 46px;
-  width: 185px;
+  height: 54px;
+  width: 240px;
   background-color: var(--bg);
   /*border: solid var(--light-txt) 2px;*/
   color: var(--light-txt);
-  font: 10pt Helvetica;
+  font: 12pt Helvetica;
   padding: 5px;
   margin: auto;
   margin-top: 10px;

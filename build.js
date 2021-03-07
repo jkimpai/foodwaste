@@ -55,6 +55,9 @@ function update() {
     var yrData = data.filter(function(d) {
       return (d.year == yr) && (d.unitID == un) && (d.actID == ac) && (d.var != "Food Loss");
     });
+
+    yrData = yrData.sort((a, b) => d3.descending(a.val, b.val));
+
     var total = yrData.reduce(function(sum, d) {
       return sum + d.val;
     }, 0);
