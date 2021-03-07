@@ -1,40 +1,52 @@
 <!DOCTYPE html>
-<link rel="stylesheet" href="style.css">
-<div id="all">
-  <div id="headerBar">
-    <h2>Food Waste in the US</h2>
-    <h3>broken down into food types & categories</h3>
-  </div>  
-  <div id="graphs">
-    <div class="graphDiv" id="barDiv">
-      <svg id="barSvg"></svg>
-    </div>
-    <div class="graphDiv" id="pieDiv">
-      <svg id="pieSvg"></svg>
-      <div id="tooltipDiv"></div>
-    </div>
-  </div>
-</div>
-<div id="optionsBox">
-    <div class="checkbox">
-      <label>Data Year:</label>
-      <form id="yrForm">
-        <input type="radio" name="yr" value="2010" checked>2010<br />
-        <input type="radio" name="yr" value="2008">2008<br />
-      </form>
-    </div>
-    <div class="checkbox">
-      <label>Data Category:</label>
-      <form id="actForm">
-        <input type="radio" name="act" value="HOUSEHOLDS" checked>Household<br />
-        <input type="radio" name="act" value="WHOLESALEANDRETAIL">Wholesale & Retail<br />
-      </form>
-    </div>
-  </div>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-<script src="https://d3js.org/d3.v4.min.js"></script>
-<script src="sharedVars.js"></script>
-<script src="pie.js"></script>
-<script src="bar.js"></script>
-<script src="build.js"></script>
+<html lang="en">
+	<head>
+	  <title>Food Waste Data Viz</title>
+	  <link rel="stylesheet" href="style.css">
+	</head>
 
+	<body>
+		<!-- graphs -->
+		<div id="all">
+		  <div id="headerBar">
+		    <h2>Food Waste in the US</h2>
+		    <h3>broken down into food types & categories</h3>
+		  </div>  
+		  <div id="graphs">
+		    <div class="graphDiv" id="barDiv">
+		      <svg id="barSvg"></svg>
+		    </div>
+		    <div class="graphDiv" id="pieDiv">
+		      <svg id="pieSvg"></svg>
+		      <div id="tooltipDiv"></div>
+		    </div>
+		  </div>
+		</div>
+
+		<!-- menu for year and category -->
+		<div id="optionsBox">
+		    <div class="checkbox">
+		      <label>Data Year:</label>
+		      <form id="yrForm">
+		        <input type="radio" name="yr" value="2010" checked>2010<br />
+		        <input type="radio" name="yr" value="2008">2008<br />
+		      </form>
+		    </div>
+		    <div class="checkbox">
+		      <label>Data Category:</label>
+		      <form id="actForm">
+		        <input type="radio" name="act" value="HOUSEHOLDS" checked>Household<br />
+		        <input type="radio" name="act" value="WHOLESALEANDRETAIL">Wholesale & Retail<br />
+		      </form>
+		    </div>
+		</div>
+
+		<!-- scripts -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+		<script src="https://d3js.org/d3.v4.min.js"></script>
+		<script src="sharedVars.js"></script>
+		<script src="pie.js"></script>
+		<script src="bar.js"></script>
+		<script src="build.js"></script>
+	</body>
+</html>
