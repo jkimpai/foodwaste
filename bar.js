@@ -1,7 +1,7 @@
 // bar variables
 var barWdthPct = 0.5,
   barHghtPct = 0.7,
-  barMargin = {top: 0, right: 0, bottom: 120, left: 60},
+  barMargin = {top: 0, right: 0, bottom: 140, left: 70},
   barWidth = Math.max(Math.floor(width * barWdthPct) - barMargin.left, minWidth),
   barHeight = Math.max(Math.floor(height * barHghtPct) - barMargin.bottom, minHeight);
 
@@ -36,9 +36,9 @@ function buildBarGraph(yrData, total) {
     .call(d3.axisLeft(y))
     .append("text")
       .attr("transform", "rotate(-90)")
-      .attr("y", "-50")
-      .attr("x", "-30")
-      .attr("text-anchor", "end")
+      .attr("y", "-60")
+      .attr("x", "-250")
+      .attr("text-anchor", "middle")
       .text("Waste in Millions of KGs");
 
   // adding individual bars
