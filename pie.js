@@ -15,7 +15,8 @@ var pieSvg = d3.select("#pieSvg")
 // arcs for the pie graph
 var arc = d3.arc()
   .outerRadius(radius)
-  .innerRadius(radius - donutWidth);
+  .innerRadius(radius - donutWidth)
+  .padAngle(.005);
 
 var pie = d3.pie()
   .sort(null)

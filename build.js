@@ -27,6 +27,8 @@ d3.csv("https://raw.githubusercontent.com/jkimpai/foodwaste/master/us-fw-2008-20
     && (d.var != "Food Loss");
   });
 
+  yrData = yrData.sort((a, b) => d3.descending(a.val, b.val));
+
   // calculate the total amount of waste (for calculating %)
   total = yrData.reduce(function(sum, d) {
     return sum + d.val;

@@ -19,6 +19,7 @@ var bars = barSvg.append("g")
   .attr("transform", "translate(" + barMargin.left + "," + barMargin.top + ")");
 
 function buildBarGraph(yrData, total) {
+
 	// build bar graph
   x.domain(yrData.map(function(d) { return d.var; }));
   y.domain([0, d3.max(yrData, function(d) { return d.val; })]);

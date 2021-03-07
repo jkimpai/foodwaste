@@ -11,7 +11,7 @@ var minWidth = 200,
 
 // colormap
 var colorMap = d3.scaleOrdinal()
-  .range(["#CFF09E", "#A8DBA8", "#79BD9A", "#3B8686", "#216b96", "#0B486B"]);
+  .range(["#a49fcc", "#80bdc3", "#8cacd3", "#91c2b6", "#7eb6cf"]);
 
 // tooltip to show more information about hovered element
 var tooltip = d3.select("#tooltipDiv");
@@ -27,7 +27,7 @@ tooltip.append("div")
 
 function mouseOvr(id, vr, val, tot) {
   d3.selectAll("#"+id)
-    .style("fill", "orange");
+    .style("fill", "#fff27a");
   tooltip.select(".label").html(vr);
   tooltip.select(".count").html(val.toFixed(2) + " million kg");
   tooltip.select(".percent").html((val/tot * 100).toFixed(2) + "%");
